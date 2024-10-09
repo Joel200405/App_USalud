@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'trapezoid_painter.dart';
-import '../services/api_service.dart'; // Asegúrate de incluir el ApiService si lo necesitas
-import '../styles/colors.dart'; // Asegúrate de incluir los colores
+import '../styles/colors.dart';
 
 class ResetPasswordScreen extends StatelessWidget {
   const ResetPasswordScreen({super.key});
