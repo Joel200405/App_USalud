@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:usalud_app/styles/colors.dart';
 
 class TrapezoidPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint()
-      ..color = Color.fromRGBO(110, 244, 220, 1)
+      ..color = AppColors.accent
       ..style = PaintingStyle.fill;
     final Path path = Path();
 

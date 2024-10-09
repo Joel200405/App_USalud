@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = 'http://192.168.1.20:3000'; // Cambié la URL base para usarla en varias rutas
+  static const String baseUrl = 'http://192.168.1.20:3000';
   
   // Método para registrar un usuario
   Future<bool> registerUser({
@@ -38,10 +38,9 @@ class ApiService {
   }
 
   // Método para iniciar sesión
-  // Método para iniciar sesión
   Future<Map<String, dynamic>> loginUser({required String correo, required String contrasena}) async {
     final response = await http.post(
-      Uri.parse('$baseUrl/auth/login'), // Cambiado a la ruta correcta
+      Uri.parse('$baseUrl/auth/login'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -52,7 +51,7 @@ class ApiService {
     );
 
     print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}'); // Imprimir la respuesta para verificar
+    print('Response body: ${response.body}');
 
     if (response.statusCode == 200) {
       try {

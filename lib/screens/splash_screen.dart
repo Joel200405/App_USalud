@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'login_screen.dart';
+import '../styles/colors.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -20,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
     _animateDots();
   }
 
-// Animación de la barra de carga
+  // Animación de la barra de carga
   void _startLoading() {
     Timer.periodic(Duration(milliseconds: 100), (Timer timer) {
       setState(() {
@@ -34,7 +35,7 @@ class _SplashScreenState extends State<SplashScreen> {
     });
   }
 
-// Animación de los puntos ...
+  // Animación de los puntos ...
   void _animateDots() {
     Timer.periodic(Duration(milliseconds: 500), (Timer timer) {
       setState(() {
@@ -55,7 +56,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromRGBO(110, 244, 220, 1),
+      backgroundColor: AppColors.accent,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -75,7 +76,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   Container(
                     height: 20,
                     decoration: BoxDecoration(
-                      color: Color.fromRGBO(40, 94, 150, 1),
+                      color: AppColors.primary,
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
@@ -87,7 +88,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     bottom: 2,
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: AppColors.white,
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
@@ -104,7 +105,7 @@ class _SplashScreenState extends State<SplashScreen> {
                         value: _progress,
                         backgroundColor: Colors.transparent,
                         valueColor: AlwaysStoppedAnimation<Color>(
-                          Color.fromRGBO(74, 135, 198, 1),
+                          AppColors.secondary,
                         ),
                       ),
                     ),
@@ -119,7 +120,7 @@ class _SplashScreenState extends State<SplashScreen> {
             Text(
               _loadingText,
               style: TextStyle(
-                color: Color.fromRGBO(40, 94, 150, 1),
+                color: AppColors.primary,
                 fontSize: 16,
                 fontFamily: 'Poppins',
                 fontWeight: FontWeight.bold,

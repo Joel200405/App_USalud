@@ -72,7 +72,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: CustomPaint(
-                  size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height * 0.55),
+                  size: Size(MediaQuery.of(context).size.width,
+                      MediaQuery.of(context).size.height * 0.55),
                   painter: TrapezoidPainter(),
                 ),
               ),
@@ -114,25 +115,34 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           const SizedBox(height: 20),
                           _buildTextField('Nombres', _nombreController),
-                          _buildTextField('Apellido paterno', _apellidoPaternoController),
-                          _buildTextField('Apellido materno', _apellidoMaternoController),
-                          _buildTextField('Número de celular', _telefonoController),
-                          _buildTextField('Correo electrónico', _correoController),
-                          _buildPasswordField('Contraseña', _passwordController),
+                          _buildTextField(
+                              'Apellido paterno', _apellidoPaternoController),
+                          _buildTextField(
+                              'Apellido materno', _apellidoMaternoController),
+                          _buildTextField(
+                              'Número de celular', _telefonoController),
+                          _buildTextField(
+                              'Correo electrónico', _correoController),
+                          _buildPasswordField(
+                              'Contraseña', _passwordController),
                           _buildConfirmPasswordField(),
                           const SizedBox(height: 20),
                           ElevatedButton(
                             onPressed: () async {
                               String nombre = _nombreController.text;
-                              String apellidoPaterno = _apellidoPaternoController.text;
-                              String apellidoMaterno = _apellidoMaternoController.text;
+                              String apellidoPaterno =
+                                  _apellidoPaternoController.text;
+                              String apellidoMaterno =
+                                  _apellidoMaternoController.text;
                               String telefono = _telefonoController.text;
                               String correo = _correoController.text;
                               String contrasena = _passwordController.text;
 
                               // Validación de contraseñas
-                              if (_passwordController.text != _confirmPasswordController.text) {
-                                _showDialog('Notificación de Alerta', 'Las contraseñas no coinciden.');
+                              if (_passwordController.text !=
+                                  _confirmPasswordController.text) {
+                                _showDialog('Notificación de Alerta',
+                                    'Las contraseñas no coinciden.');
                                 return;
                               }
 
@@ -147,9 +157,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               );
 
                               if (success) {
-                                _showDialog('Notificación de Éxito', 'Usuario registrado correctamente.');
+                                _showDialog('Notificación de Éxito',
+                                    'Usuario registrado correctamente.');
                               } else {
-                                _showDialog('Notificación de Alerta', 'No se pudo crear el usuario, puede que ya exista.');
+                                _showDialog('Notificación de Alerta',
+                                    'No se pudo crear el usuario, puede que ya exista.');
                               }
                             },
                             style: ElevatedButton.styleFrom(
@@ -282,19 +294,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
       style: const TextStyle(
         fontFamily: 'Poppins',
         fontSize: 16,
-        color: AppColors.textPrimary,
+        color: AppColors.textPrimary, // Color del texto que se escribe
       ),
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(
           fontFamily: 'Poppins',
-          color: AppColors.textPrimary,
+          color: AppColors.textSecondary, // Color de la etiqueta
         ),
         enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: defaultUnderlineColor),
+          borderSide: BorderSide(
+              color: AppColors
+                  .textSecondary), // Color de la línea debajo del campo
         ),
         focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: focusedUnderlineColor),
+          borderSide: BorderSide(
+              color: focusedUnderlineColor), // Color de la línea enfocada
         ),
       ),
     );
@@ -307,19 +322,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
       style: const TextStyle(
         fontFamily: 'Poppins',
         fontSize: 16,
-        color: AppColors.textPrimary,
+        color: AppColors.textPrimary, // Color del texto que se escribe
       ),
       decoration: InputDecoration(
         labelText: label,
         labelStyle: const TextStyle(
           fontFamily: 'Poppins',
-          color: AppColors.textPrimary,
+          color: AppColors.textSecondary, // Color de la etiqueta
         ),
         enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: defaultUnderlineColor),
+          borderSide: BorderSide(
+              color: AppColors
+                  .textSecondary), // Color de la línea debajo del campo
         ),
         focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: focusedUnderlineColor),
+          borderSide: BorderSide(
+              color: focusedUnderlineColor), // Color de la línea enfocada
         ),
       ),
     );
@@ -332,23 +350,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
       style: const TextStyle(
         fontFamily: 'Poppins',
         fontSize: 16,
-        color: AppColors.textPrimary,
+        color: AppColors.textPrimary, // Color del texto que se escribe
       ),
       decoration: InputDecoration(
         labelText: 'Confirmar contraseña',
         labelStyle: const TextStyle(
           fontFamily: 'Poppins',
-          color: AppColors.textPrimary,
+          color: AppColors.textSecondary, // Color de la etiqueta
         ),
         enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: defaultUnderlineColor),
+          borderSide: BorderSide(
+              color: AppColors.textSecondary), // Color de la línea debajo del campo
         ),
         focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: focusedUnderlineColor),
+          borderSide: BorderSide(
+              color: focusedUnderlineColor), // Color de la línea enfocada
         ),
         suffixIcon: IconButton(
           icon: Icon(
-            _obscureTextConfirmPassword ? Icons.visibility_off : Icons.visibility,
+            _obscureTextConfirmPassword
+                ? Icons.visibility_off
+                : Icons.visibility,
             color: AppColors.iconColor,
           ),
           onPressed: () {
