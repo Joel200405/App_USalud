@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart'; 
 import 'trapezoid_painter.dart';
 import '../services/api_service.dart';
 import '../styles/colors.dart';
@@ -16,6 +17,42 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   final ApiService _apiService = ApiService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedCredentials(); // Carga las credenciales guardadas
+  }
+
+  Future<void> _loadSavedCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? savedEmail = prefs.getString('email');
+    String? savedPassword = prefs.getString('password');
+    bool? remember = prefs.getBool('remember') ?? false;
+
+    if (savedEmail != null) {
+      _emailController.text = savedEmail;
+    }
+    if (savedPassword != null) {
+      _passwordController.text = savedPassword;
+    }
+    setState(() {
+      _rememberPassword = remember; // Establecer el estado del checkbox
+    });
+  }
+
+  Future<void> _saveCredentials() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (_rememberPassword) {
+      await prefs.setString('email', _emailController.text);
+      await prefs.setString('password', _passwordController.text);
+      await prefs.setBool('remember', true);
+    } else {
+      await prefs.remove('email');
+      await prefs.remove('password');
+      await prefs.setBool('remember', false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -231,8 +268,12 @@ class _LoginScreenState extends State<LoginScreen> {
           if (result['error'] == true) {
             _showSnackbar(result['message']);
           } else {
+            // Imprimir el token en la consola
+            print("Token: ${result['token']}");
+            
+            await _saveCredentials(); // Guarda las credenciales si se selecciona el checkbox
             _showSnackbar("Inicio de sesión exitoso");
-            Navigator.pushReplacementNamed(context, '/home');
+            Navigator.pushReplacementNamed(context, '/service');
           }
         } else {
           _showSnackbar("Por favor, completa todos los campos.");

@@ -3,6 +3,7 @@ import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/reset_password_screen.dart';
 import 'screens/splash_screen.dart';
+import 'screens/services_screen.dart'; // Importar la pantalla de usuario
 
 void main() {
   runApp(AppSalud());
@@ -20,10 +21,11 @@ class AppSalud extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => SplashScreen(), // Pantalla inicial
+        '/': (context) => SplashScreen(),
         '/login': (context) => LoginScreen(),
         '/register': (context) => RegisterScreen(),
         '/reset_password': (context) => ResetPasswordScreen(),
+        '/service': (context) => ServicesScreen(), // Definir la ruta para UserScreen
       },
     );
   }
