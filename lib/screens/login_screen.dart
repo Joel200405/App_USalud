@@ -21,6 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color.fromRGBO(110, 244, 220, 1), // Color del encabezado
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
@@ -33,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
         title: const Text(
           'Inicio de sesión',
           style: TextStyle(
-            color: AppColors.primary,
+            color: AppColors.primary, // Mantener color del texto
             fontFamily: 'Poppins',
             fontWeight: FontWeight.bold,
           ),
@@ -51,24 +52,20 @@ class _LoginScreenState extends State<LoginScreen> {
       resizeToAvoidBottomInset: true,
       body: GestureDetector(
         onTap: () {
-          FocusScope.of(context).unfocus();
+          FocusScope.of(context).unfocus(); // Ocultar el teclado al hacer tap en cualquier lugar
         },
         child: Stack(
           children: [
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: CustomPaint(
-                size: Size(
-                  MediaQuery.of(context).size.width,
-                  MediaQuery.of(context).size.height * 0.55,
-                ),
-                painter: TrapezoidPainter(),
-              ),
+            // Dibuja el trapezoide en la parte superior
+            CustomPaint(
+              size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height * 0.5),
+              painter: TrapezoidPainter(),
             ),
-            SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Center(
+            // Centrar el contenedor de forma dinámica y evitar que se vea afectado por el teclado
+            Center(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: _buildLoginForm(context),
                 ),
               ),
@@ -228,15 +225,13 @@ class _LoginScreenState extends State<LoginScreen> {
       onPressed: () async {
         String correo = _emailController.text.trim();
         String contrasena = _passwordController.text.trim();
-        
-        // Lógica para iniciar sesión
+
         if (correo.isNotEmpty && contrasena.isNotEmpty) {
           var result = await _apiService.loginUser(correo: correo, contrasena: contrasena);
           if (result['error'] == true) {
             _showSnackbar(result['message']);
           } else {
             _showSnackbar("Inicio de sesión exitoso");
-            // Navegación a otra pantalla después de inicio de sesión
             Navigator.pushReplacementNamed(context, '/home');
           }
         } else {
@@ -303,10 +298,10 @@ class _LoginScreenState extends State<LoginScreen> {
           child: const Text(
             "Regístrate",
             style: TextStyle(
-              color: AppColors.primary,
-              fontWeight: FontWeight.bold,
               fontFamily: 'Poppins',
               fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primary,
             ),
           ),
         ),

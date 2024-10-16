@@ -9,6 +9,7 @@ class ResetPasswordScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color.fromRGBO(110, 244, 220, 1),
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
@@ -39,25 +40,23 @@ class ResetPasswordScreen extends StatelessWidget {
       resizeToAvoidBottomInset: true,
       body: GestureDetector(
         onTap: () {
-          FocusScope.of(context).unfocus();
+          FocusScope.of(context).unfocus(); // Ocultar el teclado al hacer tap en cualquier lugar
         },
         child: Stack(
           children: [
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: CustomPaint(
-                size: Size(
-                  MediaQuery.of(context).size.width,
-                  MediaQuery.of(context).size.height * 0.55,
-                ),
-                painter: TrapezoidPainter(), // Asegúrate de tener TrapezoidPainter importado
+            // Dibuja el trapezoide en la parte superior
+            CustomPaint(
+              size: Size(
+                MediaQuery.of(context).size.width,
+                MediaQuery.of(context).size.height * 0.5,
               ),
+              painter: TrapezoidPainter(), // Asegúrate de tener TrapezoidPainter importado
             ),
-            // Ajustar el contenedor para estar centrado
+            // Centrar el contenedor de forma dinámica y evitar que se vea afectado por el teclado
             Center(
               child: SingleChildScrollView(
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: _buildResetPasswordForm(context),
                 ),
               ),
