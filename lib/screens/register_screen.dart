@@ -39,20 +39,174 @@ class _RegisterScreenState extends State<RegisterScreen> {
             Navigator.of(context).pop();
           },
         ),
-        title: Image.asset(
-          'assets/images/Logo_App.png',
-          width: 140,
-          height: 60,
-          fit: BoxFit.contain,
+        title: const Text(
+          'Registrarse',
+          style: TextStyle(
+            color: AppColors.primary, // Mantener color del texto
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
-          IconButton(
+          PopupMenuButton<String>(
             icon: const Icon(
               Icons.menu,
               color: AppColors.primary,
             ),
-            onPressed: () {},
-          ),
+            color: AppColors.primary, // Color de fondo del menú desplegable
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(16.0)), // Bordes redondeados
+            ),
+            onSelected: (String route) {
+              Navigator.pushNamed(context, route);
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: '/login',
+                child: Row(
+                  children: [
+                    Icon(Icons.login, color: AppColors.white), // Ícono de inicio de sesión
+                    const SizedBox(width: 8), // Espacio entre ícono y texto
+                    Text(
+                      'Inicio de Sesión',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        color: AppColors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: '/register',
+                child: Row(
+                  children: [
+                    Icon(Icons.person_add, color: AppColors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Registro',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        color: AppColors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: '/reset_password',
+                child: Row(
+                  children: [
+                    Icon(Icons.lock_reset, color: AppColors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Recuperar Contraseña',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        color: AppColors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: '/symptoms',
+                child: Row(
+                  children: [
+                    Icon(Icons.add_circle, color: AppColors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Agregar Síntomas',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        color: AppColors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: '/clinics',
+                child: Row(
+                  children: [
+                    Icon(Icons.local_hospital, color: AppColors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Listado de Clínicas',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        color: AppColors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: '/meeting',
+                child: Row(
+                  children: [
+                    Icon(Icons.event, color: AppColors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Citas',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        color: AppColors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: '/emergencias',
+                child: Row(
+                  children: [
+                    Icon(Icons.check, color: AppColors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Sugerencias',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        color: AppColors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: '/perfil',
+                child: Row(
+                  children: [
+                    Icon(Icons.info, color: AppColors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Información',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        color: AppColors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          )
         ],
       ),
       resizeToAvoidBottomInset: true,
@@ -95,16 +249,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Registrarse',
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 25,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
+                        Image.asset(
+                          'assets/images/Logo_App.png',
+                          width: 120,
+                          height: 120,
+                          fit: BoxFit.contain,
                         ),
-                        const SizedBox(height: 20),
                         _buildTextField('Nombres', _nombreController),
                         _buildTextField('Apellido paterno', _apellidoPaternoController),
                         _buildTextField('Apellido materno', _apellidoMaternoController),

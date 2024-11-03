@@ -32,6 +32,7 @@ dependencies:
     sdk: flutter
   http: ^1.2.2
   shared_preferences: ^2.3.2
+  dropdown_button2: ^2.3.9
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -68,6 +69,14 @@ flutter:
 
   assets:
     - assets/images/Logo_App.png
+    - assets/images/Confia_Salud.jpg
+    - assets/images/Ortega.png
+    - assets/images/zarate.jpg
+    - assets/images/rebagliati.jpg
+    - assets/images/carrion.jpg
+    - assets/images/carmen.jpg
+    - assets/images/chenet.jpg
+    - assets/images/santo.png
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

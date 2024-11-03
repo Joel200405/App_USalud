@@ -1,30 +1,50 @@
 import 'package:flutter/material.dart';
-import 'trapezoid_painter.dart';
-import '../styles/colors.dart';
+import '../styles/colors.dart'; // Asegúrate de tener esta ruta correcta
+import '../services/api_service.dart'; // Asegúrate de que esta ruta sea correcta
 
-class ResetPasswordScreen extends StatelessWidget {
-  const ResetPasswordScreen({super.key});
+class ClinicsScreen extends StatefulWidget {
+  const ClinicsScreen({super.key});
+
+  @override
+  _ClinicsScreenState createState() => _ClinicsScreenState();
+}
+
+class _ClinicsScreenState extends State<ClinicsScreen> {
+  List<dynamic> _clinics = [];
+  final ApiService _apiService = ApiService(); // Instancia del ApiService
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchClinics(); // Llama al método para obtener clínicas
+  }
+
+  Future<void> _fetchClinics() async {
+    final clinics = await _apiService.fetchClinics(); // Llama al nuevo método
+    setState(() {
+      _clinics = clinics; // Actualiza el estado con las clínicas obtenidas
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(110, 244, 220, 1),
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back,
-            color: AppColors.primary,
+            color: AppColors.primary, // Cambia el color del icono de retroceder
           ),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(); // Vuelve a la pantalla anterior
           },
         ),
         title: const Text(
-          'Restablecer contraseña',
+          'Listado de Centros de Salud',
           style: TextStyle(
-            color: AppColors.primary,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.bold,
+            color: AppColors.primary,
           ),
         ),
         actions: [
@@ -188,203 +208,117 @@ class ResetPasswordScreen extends StatelessWidget {
             ],
           )
         ],
+        backgroundColor: const Color.fromRGBO(110, 244, 220, 1),
       ),
-      resizeToAvoidBottomInset: true,
-      body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus(); // Ocultar el teclado al hacer tap en cualquier lugar
-        },
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: _clinics.isEmpty 
+            ? Center(child: CircularProgressIndicator()) // Muestra un loader mientras se cargan las clínicas
+            : GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // Dos contenedores por fila
+                  crossAxisSpacing: 16.0,
+                  mainAxisSpacing: 16.0,
+                ),
+                itemCount: _clinics.length,
+                itemBuilder: (context, index) {
+                  return _buildClinicButton(context, _clinics[index]);
+                },
+              ),
+      ),
+    );
+  }
+
+  Widget _buildClinicButton(BuildContext context, dynamic clinic) {
+    // Convertir la calificación a double para evitar errores de tipo
+    double calificacion = (clinic['calificacion'] as num).toDouble();
+
+    return GestureDetector(
+      onTap: () {
+        // Aquí puedes manejar la navegación a la pantalla de detalles de la clínica
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15),
+          color: Colors.white, // Fondo blanco para el marco
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26, // Color de la sombra
+              blurRadius: 8, // Desenfoque de la sombra
+              spreadRadius: 1, // Expansión de la sombra
+              offset: Offset(0, 4), // Desplazamiento de la sombra
+            ),
+          ],
+        ),
+        clipBehavior: Clip.antiAlias, // Esta propiedad asegura que el contenido no sobresalga
         child: Stack(
           children: [
-            // Dibuja el trapezoide en la parte superior
-            CustomPaint(
-              size: Size(
-                MediaQuery.of(context).size.width,
-                MediaQuery.of(context).size.height * 0.5,
-              ),
-              painter: TrapezoidPainter(), // Asegúrate de tener TrapezoidPainter importado
-            ),
-            // Centrar el contenedor de forma dinámica y evitar que se vea afectado por el teclado
-            Center(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: _buildResetPasswordForm(context),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildResetPasswordForm(BuildContext context) {
-    return Container(
-      width: 355,
-      padding: const EdgeInsets.all(25.0),
-      decoration: BoxDecoration(
-        color: AppColors.white,
-        border: Border.all(color: AppColors.border, width: 2),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadow.withOpacity(0.5),
-            spreadRadius: 5,
-            blurRadius: 7,
-            offset: const Offset(0, 1),
-          ),
-        ],
-      ),
-      child: Theme(
-        data: Theme.of(context).copyWith(
-          textSelectionTheme: TextSelectionThemeData(
-            cursorColor: AppColors.secondary,
-            selectionColor: AppColors.secondary.withOpacity(0.3),
-            selectionHandleColor: AppColors.secondary,
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+            // Widget para mostrar la imagen de fondo
             Image.asset(
-              'assets/images/Logo_App.png',
-              width: 120,
-              height: 120,
-              fit: BoxFit.contain,
+              clinic['foto_url'], // Usa foto_url que contiene la ruta de la imagen
+              fit: BoxFit.cover, // Ajusta cómo se adapta la imagen
+              width: double.infinity, // Ocupa todo el ancho del contenedor
+              height: 140, // Ajusta la altura según sea necesario
             ),
-            const SizedBox(height: 10),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: const Text(
-                "Para restablecer su contraseña:",
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 16,
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.bold
-                ),
+            // Widget para el contenido (nombre y calificación) encima de la imagen
+            Container(
+              padding: const EdgeInsets.all(8.0), // Espaciado interno
+              alignment: Alignment.bottomCenter, // Alinea el contenido en la parte inferior central
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end, // Alinea el contenido en la parte inferior
+                crossAxisAlignment: CrossAxisAlignment.center, // Alinea el contenido horizontalmente en el centro
+                children: [
+                  Text(
+                    clinic['nombre'], // Nombre de la clínica
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 4), // Espacio entre nombre y calificación
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: _buildStarRating(calificacion),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 10),
-            _buildEmailField(),
-            const SizedBox(height: 20),
-            _buildSendButton(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildEmailField() {
-    return TextField(
-      decoration: const InputDecoration(
-        labelText: 'Correo electrónico o celular',
-        labelStyle: TextStyle(
-          fontFamily: 'Poppins',
-          fontSize: 16,
-          color: AppColors.textSecondary,
-        ),
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: AppColors.secondary),
-        ),
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Colors.grey),
-        ),
-      ),
-      style: const TextStyle(
-        fontFamily: 'Poppins',
-        fontSize: 16,
-        color: AppColors.textPrimary,
-      ),
-      cursorColor: AppColors.secondary,
-    );
-  }
-
-  Widget _buildSendButton(BuildContext context) {
-    return ElevatedButton(
-      onPressed: () {
-        // Mostrar la ventana de notificación al presionar el botón
-        _showDialog(context, 'Código enviado', 'Te hemos enviado un código para restablecer tu contraseña.');
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-      ),
-      child: const Text(
-        '                 ENVIAR                 ',
-        style: TextStyle(
-          color: AppColors.white,
-          fontFamily: 'Poppins',
-          fontWeight: FontWeight.bold,
-          fontSize: 16,
-        ),
-      ),
-    );
-  }
-
-  // Función para mostrar la notificación
-  void _showDialog(BuildContext context, String title, String message) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: AppColors.accent,
-          contentPadding: const EdgeInsets.all(15.0),
-          title: Text(
-            title,
-            style: const TextStyle(
-              fontSize: 20,
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  message,
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    color: AppColors.textPrimary,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 15),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                child: const Text(
-                  'ACEPTAR',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    color: AppColors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  // Método para construir las estrellas basado en la calificación
+  List<Widget> _buildStarRating(double rating) {
+    List<Widget> stars = [];
+    for (int i = 1; i <= 5; i++) {
+      if (i <= rating) {
+        // Estrella llena
+        stars.add(const Icon(
+          Icons.star,
+          color: Color.fromRGBO(250, 142, 4, 1),
+          size: 20,
+        ));
+      } else if (i - rating < 1) {
+        // Media estrella
+        stars.add(const Icon(
+          Icons.star_half,
+          color: Color.fromRGBO(250, 142, 4, 1),
+          size: 20,
+        ));
+      } else {
+        // Estrella vacía
+        stars.add(const Icon(
+          Icons.star_border,
+          color: Color.fromRGBO(250, 142, 4, 1),
+          size: 20,
+        ));
+      }
+    }
+    return stars;
   }
 }

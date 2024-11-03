@@ -55,63 +55,216 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(110, 244, 220, 1), // Color del encabezado
-        leading: IconButton(
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      backgroundColor: const Color.fromRGBO(110, 244, 220, 1), // Color del encabezado
+      leading: IconButton(
+        icon: const Icon(
+          Icons.arrow_back,
+          color: AppColors.primary,
+        ),
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+      ),
+      title: const Text(
+        'Inicio de sesión',
+        style: TextStyle(
+          color: AppColors.primary, // Mantener color del texto
+          fontFamily: 'Poppins',
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      actions: [
+        PopupMenuButton<String>(
           icon: const Icon(
-            Icons.arrow_back,
+            Icons.menu,
             color: AppColors.primary,
           ),
-          onPressed: () {
-            Navigator.of(context).pop();
+          color: AppColors.primary, // Color de fondo del menú desplegable
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(16.0)), // Bordes redondeados
+          ),
+          onSelected: (String route) {
+            Navigator.pushNamed(context, route);
           },
-        ),
-        title: const Text(
-          'Inicio de sesión',
-          style: TextStyle(
-            color: AppColors.primary, // Mantener color del texto
-            fontFamily: 'Poppins',
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.menu,
-              color: AppColors.primary,
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            const PopupMenuItem<String>(
+              value: '/login',
+              child: Row(
+                children: [
+                  Icon(Icons.login, color: AppColors.white), // Ícono de inicio de sesión
+                  const SizedBox(width: 8), // Espacio entre ícono y texto
+                  Text(
+                    'Inicio de Sesión',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      color: AppColors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            onPressed: () {},
-          ),
-        ],
-      ),
-      resizeToAvoidBottomInset: true,
-      body: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus(); // Ocultar el teclado al hacer tap en cualquier lugar
-        },
-        child: Stack(
-          children: [
-            // Dibuja el trapezoide en la parte superior
-            CustomPaint(
-              size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height * 0.5),
-              painter: TrapezoidPainter(),
+            const PopupMenuItem<String>(
+              value: '/register',
+              child: Row(
+                children: [
+                  Icon(Icons.person_add, color: AppColors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Registro',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      color: AppColors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            // Centrar el contenedor de forma dinámica y evitar que se vea afectado por el teclado
-            Center(
-              child: SingleChildScrollView(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: _buildLoginForm(context),
-                ),
+            const PopupMenuItem<String>(
+              value: '/reset_password',
+              child: Row(
+                children: [
+                  Icon(Icons.lock_reset, color: AppColors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Recuperar Contraseña',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      color: AppColors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const PopupMenuItem<String>(
+              value: '/symptoms',
+              child: Row(
+                children: [
+                  Icon(Icons.add_circle, color: AppColors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Agregar Síntomas',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      color: AppColors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const PopupMenuItem<String>(
+              value: '/clinics',
+              child: Row(
+                children: [
+                  Icon(Icons.local_hospital, color: AppColors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Listado de Clínicas',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      color: AppColors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const PopupMenuItem<String>(
+              value: '/meeting',
+              child: Row(
+                children: [
+                  Icon(Icons.event, color: AppColors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Citas',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      color: AppColors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const PopupMenuItem<String>(
+              value: '/emergencias',
+              child: Row(
+                children: [
+                  Icon(Icons.check, color: AppColors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Sugerencias',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      color: AppColors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const PopupMenuItem<String>(
+              value: '/perfil',
+              child: Row(
+                children: [
+                  Icon(Icons.info, color: AppColors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Información',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      color: AppColors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
-        ),
+        )
+      ],
+    ),
+    resizeToAvoidBottomInset: true,
+    body: GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus(); // Ocultar el teclado al hacer tap en cualquier lugar
+      },
+      child: Stack(
+        children: [
+          // Dibuja el trapezoide en la parte superior
+          CustomPaint(
+            size: Size(MediaQuery.of(context).size.width, MediaQuery.of(context).size.height * 0.5),
+            painter: TrapezoidPainter(),
+          ),
+          // Centrar el contenedor de forma dinámica y evitar que se vea afectado por el teclado
+          Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: _buildLoginForm(context),
+              ),
+            ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   Widget _buildLoginForm(BuildContext context) {
     return Container(
