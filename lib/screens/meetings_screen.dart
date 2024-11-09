@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../styles/colors.dart';
 import '../services/category.dart';
 import '../services/api_service.dart'; // Asegúrate de importar ApiService
-import '../services/clinic.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/services.dart';
 
@@ -69,7 +68,6 @@ class MeetingsScreen extends StatefulWidget {
 
 class _MeetingsScreenState extends State<MeetingsScreen> {
   final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _daysController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
 
@@ -83,10 +81,6 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
   List<Category> _categories = [];
   Category? _selectedCategory;
 
-  // Lista de clínicas
-  List<Clinica> _clinics = [];
-  Clinica? _selectedClinic;
-
   // Lista de síntomas seleccionados
   List<String> _selectedSymptoms = [];
 
@@ -97,7 +91,6 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
   void initState() {
     super.initState();
     _fetchCategoriesS(); // Carga las categorías al inicio
-    _fetchClinics(); // Carga las clínicas al inicio
   }
 
   Future<void> _fetchCategoriesS() async {
@@ -109,13 +102,6 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
     });
   }
 
-  Future<void> _fetchClinics() async {
-    ApiService apiService = ApiService();
-    List<Clinica> clinics = await apiService.fetchClinicas();
-    setState(() {
-      _clinics = clinics;
-    });
-  }
 
   // Método para buscar síntomas en tiempo real
   void _onSearchSymptoms(String query) async {

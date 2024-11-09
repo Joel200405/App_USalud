@@ -871,7 +871,7 @@ class _SymptomScreenState extends State<SymptomScreen> {
                   text: TextSpan(
                     children: [
                       const TextSpan(
-                        text: 'Enfermedad: ',
+                        text: 'Posibilidad: ',
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 17,
