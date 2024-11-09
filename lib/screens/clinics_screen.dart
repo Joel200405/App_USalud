@@ -1,51 +1,65 @@
 import 'package:flutter/material.dart';
-import '../styles/colors.dart'; // Asegúrate de tener esta ruta correcta
-import '../services/api_service.dart'; // Asegúrate de que esta ruta sea correcta
+import '../styles/colors.dart';
 
-class ClinicsScreen extends StatefulWidget {
-  const ClinicsScreen({super.key});
-
-  @override
-  _ClinicsScreenState createState() => _ClinicsScreenState();
-}
-
-class _ClinicsScreenState extends State<ClinicsScreen> {
-  List<dynamic> _clinics = [];
-  final ApiService _apiService = ApiService(); // Instancia del ApiService
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchClinics(); // Llama al método para obtener clínicas
-  }
-
-  Future<void> _fetchClinics() async {
-    final clinics = await _apiService.fetchClinics(); // Llama al nuevo método
-    setState(() {
-      _clinics = clinics; // Actualiza el estado con las clínicas obtenidas
-    });
-  }
-
+class ClinicsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, dynamic>> clinics = [
+      {
+        'name': 'Clínica ConfiaSalud',
+        'image': 'assets/images/Confia_Salud.jpg',
+        'rating': 5,
+      },
+      {
+        'name': 'Clínica Ortega',
+        'image': 'assets/images/Ortega.png',
+        'rating': 4,
+      },
+      {
+        'name': 'Clínica Zarate',
+        'image': 'assets/images/zarate.jpg',
+        'rating': 4,
+      },
+      {
+        'name': 'Clínica Rebagliati',
+        'image': 'assets/images/rebagliati.jpg',
+        'rating': 5,
+      },
+      {
+        'name': 'Clínica Chenet',
+        'image': 'assets/images/chenet.jpg',
+        'rating': 3,
+      },
+      {
+        'name': 'Santo Domingo',
+        'image': 'assets/images/santo.png',
+        'rating': 4,
+      },
+      {
+        'name': 'Daniel Alcides Carrión',
+        'image': 'assets/images/carrion.jpg',
+        'rating': 5,
+      },
+      {
+        'name': 'El Carmen',
+        'image': 'assets/images/carmen.jpg',
+        'rating': 3,
+      },
+    ];
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: AppColors.primary, // Cambia el color del icono de retroceder
-          ),
-          onPressed: () {
-            Navigator.of(context).pop(); // Vuelve a la pantalla anterior
-          },
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.primary),
+          onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text(
-          'Listado de Centros de Salud',
+        title: const Text(
+          'Centros de Salud',
           style: TextStyle(
+            color: AppColors.primary,
             fontFamily: 'Poppins',
             fontWeight: FontWeight.bold,
-            color: AppColors.primary,
-            fontSize: MediaQuery.of(context).size.width * 0.045, // Ajusta el tamaño de fuente en función del ancho de la pantalla
+            fontSize: 21
           ),
         ),
         actions: [
@@ -56,7 +70,8 @@ class _ClinicsScreenState extends State<ClinicsScreen> {
             ),
             color: AppColors.primary, // Color de fondo del menú desplegable
             shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(16.0)), // Bordes redondeados
+              borderRadius:
+                  BorderRadius.all(Radius.circular(16.0)), // Bordes redondeados
             ),
             onSelected: (String route) {
               Navigator.pushNamed(context, route);
@@ -66,7 +81,8 @@ class _ClinicsScreenState extends State<ClinicsScreen> {
                 value: '/login',
                 child: Row(
                   children: [
-                    Icon(Icons.login, color: AppColors.white), // Ícono de inicio de sesión
+                    Icon(Icons.login,
+                        color: AppColors.white), // Ícono de inicio de sesión
                     const SizedBox(width: 8), // Espacio entre ícono y texto
                     Text(
                       'Inicio de Sesión',
@@ -156,6 +172,24 @@ class _ClinicsScreenState extends State<ClinicsScreen> {
                 value: '/meeting',
                 child: Row(
                   children: [
+                    Icon(Icons.edit_note, color: AppColors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Agendar cita',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        color: AppColors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: '/perfil',
+                child: Row(
+                  children: [
                     Icon(Icons.event, color: AppColors.white),
                     const SizedBox(width: 8),
                     Text(
@@ -173,158 +207,108 @@ class _ClinicsScreenState extends State<ClinicsScreen> {
               const PopupMenuItem<String>(
                 value: '/emergencias',
                 child: Row(
-                  children: [
-                    Icon(Icons.check, color: AppColors.white),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Sugerencias',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 16,
-                        color: AppColors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const PopupMenuItem<String>(
-                value: '/perfil',
-                child: Row(
-                  children: [
-                    Icon(Icons.info, color: AppColors.white),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Información',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 16,
-                        color: AppColors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          )
-        ],
-        backgroundColor: const Color.fromRGBO(110, 244, 220, 1),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: _clinics.isEmpty 
-            ? Center(child: CircularProgressIndicator()) // Muestra un loader mientras se cargan las clínicas
-            : GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // Dos contenedores por fila
-                  crossAxisSpacing: 16.0,
-                  mainAxisSpacing: 16.0,
-                ),
-                itemCount: _clinics.length,
-                itemBuilder: (context, index) {
-                  return _buildClinicButton(context, _clinics[index]);
-                },
-              ),
-      ),
-    );
-  }
-
-  Widget _buildClinicButton(BuildContext context, dynamic clinic) {
-    // Convertir la calificación a double para evitar errores de tipo
-    double calificacion = (clinic['calificacion'] as num).toDouble();
-
-    return GestureDetector(
-      onTap: () {
-        // Aquí puedes manejar la navegación a la pantalla de detalles de la clínica
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          color: Colors.white, // Fondo blanco para el marco
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26, // Color de la sombra
-              blurRadius: 8, // Desenfoque de la sombra
-              spreadRadius: 1, // Expansión de la sombra
-              offset: Offset(0, 4), // Desplazamiento de la sombra
-            ),
-          ],
-        ),
-        clipBehavior: Clip.antiAlias, // Esta propiedad asegura que el contenido no sobresalga
-        child: Stack(
-          children: [
-            // Widget para mostrar la imagen de fondo
-            Image.asset(
-              clinic['foto_url'], // Usa foto_url que contiene la ruta de la imagen
-              fit: BoxFit.cover, // Ajusta cómo se adapta la imagen
-              width: double.infinity, // Ocupa todo el ancho del contenedor
-              height: 120, // Ajusta la altura según sea necesario
-            ),
-            // Widget para el contenido (nombre y calificación) encima de la imagen
-            Container(
-              padding: const EdgeInsets.all(8.0), // Espaciado interno
-              alignment: Alignment.bottomCenter, // Alinea el contenido en la parte inferior central
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end, // Alinea el contenido en la parte inferior
-                crossAxisAlignment: CrossAxisAlignment.center, // Alinea el contenido horizontalmente en el centro
                 children: [
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Text(
-                        clinic['nombre'], // Nombre de la clínica
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: constraints.maxWidth * 0.09, // Ajusta el tamaño de la fuente en función del ancho del contenedor
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                        textAlign: TextAlign.center,
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 4), // Espacio entre nombre y calificación
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: _buildStarRating(calificacion),
+                  Icon(Icons.check, color: AppColors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Sugerencias',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      color: AppColors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
             ),
-          ],
+            ],
+          )
+        ],
+        backgroundColor: AppColors.accent// Color azul verdoso
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: GridView.builder(
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 8.0,
+            mainAxisSpacing: 8.0,
+            childAspectRatio: 0.9999,
+          ),
+          itemCount: clinics.length,
+          itemBuilder: (context, index) {
+            return ClinicCard(
+              name: clinics[index]['name'],
+              imagePath: clinics[index]['image'],
+              rating: clinics[index]['rating'],
+            );
+          },
         ),
       ),
     );
   }
+}
 
-  // Método para construir las estrellas basado en la calificación
-  List<Widget> _buildStarRating(double rating) {
-    List<Widget> stars = [];
-    for (int i = 1; i <= 5; i++) {
-      if (i <= rating) {
-        // Estrella llena
-        stars.add(const Icon(
-          Icons.star,
-          color: Color.fromRGBO(250, 142, 4, 1),
-          size: 20,
-        ));
-      } else if (i - rating < 1) {
-        // Media estrella
-        stars.add(const Icon(
-          Icons.star_half,
-          color: Color.fromRGBO(250, 142, 4, 1),
-          size: 20,
-        ));
-      } else {
-        // Estrella vacía
-        stars.add(const Icon(
-          Icons.star_border,
-          color: Color.fromRGBO(250, 142, 4, 1),
-          size: 20,
-        ));
-      }
-    }
-    return stars;
+class ClinicCard extends StatelessWidget {
+  final String name;
+  final String imagePath;
+  final int rating;
+
+  ClinicCard({required this.name, required this.imagePath, required this.rating});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      elevation: 4,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center, // Centra el contenido horizontalmente
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(15.0)),
+            child: Image.asset(
+              imagePath,
+              height: 120,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Center(
+                  child: Text(
+                    name,
+                    style: TextStyle(
+                      fontFamily: 'Poppins', // Cambia la fuente a Poppins
+                      fontWeight: FontWeight.bold, // Negrita
+                      fontSize: 15,
+                      color: Colors.black, // Color primario
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                SizedBox(height: 4),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center, // Centra las estrellas
+                  children: List.generate(5, (index) {
+                    return Icon(
+                      Icons.star,
+                      color: index < rating ? Colors.orange : Colors.grey,
+                      size: 16,
+                    );
+                  }),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

@@ -6,7 +6,7 @@ import 'clinic.dart'; // Asegúrate de que la ruta sea correcta
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  static const String baseUrl = 'http://192.168.1.20:3000';
+  static const String baseUrl = 'http://192.168.1.22:3000';
 
   // Método para registrar un usuario
   Future<bool> registerUser({
@@ -177,7 +177,7 @@ class ApiService {
       throw Exception("Error al obtener diagnóstico");
     }
   }
- 
+
   // Método para obtener todas las clínicas
   Future<List<dynamic>> fetchClinics() async {
     final url = Uri.parse('$baseUrl/auth/clinicas');
@@ -253,7 +253,9 @@ class ApiService {
 
     if (response.statusCode == 200) {
       List<dynamic> clinicasData = json.decode(response.body);
-      return clinicasData.map<Clinica>((clinica) => Clinica.fromJson(clinica)).toList();
+      return clinicasData
+          .map<Clinica>((clinica) => Clinica.fromJson(clinica))
+          .toList();
     } else {
       print('Error al cargar clínicas: ${response.body}');
       return [];

@@ -61,7 +61,7 @@ Widget build(BuildContext context) {
       backgroundColor: const Color.fromRGBO(110, 244, 220, 1), // Color del encabezado
       leading: IconButton(
         icon: const Icon(
-          Icons.arrow_back,
+          Icons.arrow_back_ios,
           color: AppColors.primary,
         ),
         onPressed: () {
@@ -184,6 +184,24 @@ Widget build(BuildContext context) {
               value: '/meeting',
               child: Row(
                 children: [
+                  Icon(Icons.edit_note, color: AppColors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Agendar cita',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      color: AppColors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const PopupMenuItem<String>(
+              value: '/perfil',
+              child: Row(
+                children: [
                   Icon(Icons.event, color: AppColors.white),
                   const SizedBox(width: 8),
                   Text(
@@ -215,25 +233,7 @@ Widget build(BuildContext context) {
                   ),
                 ],
               ),
-            ),
-            const PopupMenuItem<String>(
-              value: '/perfil',
-              child: Row(
-                children: [
-                  Icon(Icons.info, color: AppColors.white),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Información',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 16,
-                      color: AppColors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            ),       
           ],
         )
       ],

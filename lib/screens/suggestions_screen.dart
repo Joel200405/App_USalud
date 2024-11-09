@@ -91,7 +91,7 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(
-            Icons.arrow_back,
+            Icons.arrow_back_ios,
             color: AppColors.primary,
           ),
           onPressed: () {
@@ -214,6 +214,24 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
               value: '/meeting',
               child: Row(
                 children: [
+                  Icon(Icons.edit_note, color: AppColors.white),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Agendar cita',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      color: AppColors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const PopupMenuItem<String>(
+              value: '/perfil',
+              child: Row(
+                children: [
                   Icon(Icons.event, color: AppColors.white),
                   const SizedBox(width: 8),
                   Text(
@@ -236,24 +254,6 @@ class _SuggestionsScreenState extends State<SuggestionsScreen> {
                   const SizedBox(width: 8),
                   Text(
                     'Sugerencias',
-                    style: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 16,
-                      color: AppColors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const PopupMenuItem<String>(
-              value: '/perfil',
-              child: Row(
-                children: [
-                  Icon(Icons.info, color: AppColors.white),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Información',
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 16,

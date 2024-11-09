@@ -19,7 +19,7 @@ class ViewScreen extends StatelessWidget {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(
-            Icons.arrow_back,
+            Icons.arrow_back_ios,
             color: AppColors.primary, // Cambia el color del icono de retroceder
           ),
           onPressed: () {
@@ -143,6 +143,24 @@ class ViewScreen extends StatelessWidget {
                 value: '/meeting',
                 child: Row(
                   children: [
+                    Icon(Icons.edit_note, color: AppColors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Agendar cita',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        color: AppColors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: '/perfil',
+                child: Row(
+                  children: [
                     Icon(Icons.event, color: AppColors.white),
                     const SizedBox(width: 8),
                     Text(
@@ -165,24 +183,6 @@ class ViewScreen extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       'Sugerencias',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 16,
-                        color: AppColors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const PopupMenuItem<String>(
-                value: '/perfil',
-                child: Row(
-                  children: [
-                    Icon(Icons.info, color: AppColors.white),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Información',
                       style: TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 16,
@@ -236,79 +236,129 @@ class ViewScreen extends StatelessWidget {
   }
 
   // Método para construir el contenedor de cada cita
-  Widget _buildCitaCard(BuildContext context, Cita cita) {
-    return GestureDetector(
-      onTap: () {
-        // Muestra detalles adicionales al tocar una cita
-        showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: Text('${cita.servicio} en ${cita.clinica}'),
-            content: Text(
-              'Documento: ${cita.documento}\n'
-              'Motivo: ${cita.motivo}\n'
-              'Fecha: ${formatFecha(cita.fecha)}\n'
-              'Hora: ${cita.hora}', // Muestra la hora sin cambios
+Widget _buildCitaCard(BuildContext context, Cita cita) {
+  return GestureDetector(
+    onTap: () {
+      // Muestra detalles adicionales al tocar una cita
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: AppColors.accent,
+            contentPadding: const EdgeInsets.all(15.0),
+            title: Text(
+              '${cita.servicio} en ${cita.clinica}',
+              style: const TextStyle(
+                fontSize: 20,
+                fontFamily: 'Poppins',
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary,
+              ),
+              textAlign: TextAlign.center,
             ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    'Documento: ${cita.documento}\n'
+                    'Motivo: ${cita.motivo}\n'
+                    'Fecha: ${formatFecha(cita.fecha)}\n'
+                    'Hora: ${cita.hora}',
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      color: AppColors.textPrimary,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(height: 15),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                  ),
+                  child: const Text(
+                    'ACEPTAR',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                      color: AppColors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+    child: Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 8,
+            spreadRadius: 1,
+            offset: Offset(0, 4),
           ),
-        );
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black26,
-              blurRadius: 8,
-              spreadRadius: 1,
-              offset: Offset(0, 4),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              '${cita.servicio} - ${cita.clinica}',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Fecha: ${formatFecha(cita.fecha)}',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 14,
+                color: Colors.black54,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              'Hora: ${cita.hora}',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 14,
+                color: Colors.black54,
+              ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
-        clipBehavior: Clip.antiAlias,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center, // Centra verticalmente
-            crossAxisAlignment:
-                CrossAxisAlignment.center, // Centra horizontalmente
-            children: [
-              // Título de la cita (servicio y clínica)
-              Text(
-                '${cita.servicio} - ${cita.clinica}',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-                textAlign: TextAlign.center, // Centra el texto
-              ),
-              const SizedBox(height: 8),
-              // Detalles de la cita (fecha y hora)
-              Text(
-                'Fecha: ${formatFecha(cita.fecha)}',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                  color: Colors.black54,
-                ),
-                textAlign: TextAlign.center, // Centra el texto
-              ),
-              Text(
-                'Hora: ${cita.hora}',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 14,
-                  color: Colors.black54,
-                ),
-                textAlign: TextAlign.center, // Centra el texto
-              ),
-            ],
-          ),
-        ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 }

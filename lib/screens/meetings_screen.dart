@@ -140,7 +140,7 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(110, 244, 220, 1),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.primary),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: const Text(
@@ -261,6 +261,24 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
                 value: '/meeting',
                 child: Row(
                   children: [
+                    Icon(Icons.edit_note, color: AppColors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Agendar cita',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        color: AppColors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: '/perfil',
+                child: Row(
+                  children: [
                     Icon(Icons.event, color: AppColors.white),
                     const SizedBox(width: 8),
                     Text(
@@ -283,24 +301,6 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
                     const SizedBox(width: 8),
                     Text(
                       'Sugerencias',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 16,
-                        color: AppColors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const PopupMenuItem<String>(
-                value: '/perfil',
-                child: Row(
-                  children: [
-                    Icon(Icons.info, color: AppColors.white),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Información',
                       style: TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 16,
@@ -621,90 +621,176 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
     );
   }
 
-  Widget _buildClinicSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Seleccione un centro de salud:',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 16,
-            color: AppColors.textSecondary,
-            fontWeight: FontWeight.bold,
-          ),
+  // Declara _selectedClinicName como String? en lugar de Clinica?
+String? _selectedClinicName;
+
+Widget _buildClinicSelector() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        'Seleccione un centro de salud:',
+        style: TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 16,
+          color: AppColors.textSecondary,
+          fontWeight: FontWeight.bold,
         ),
-        const SizedBox(height: 10),
-        Container(
-          width: 356,
-          child: Row(
-            children: [
-              const Icon(
-                Icons.grid_view, // Ícono para el selector
-                color: Colors.grey,
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: DropdownButton2<Clinica>(
-                  // Cambié el tipo de DropdownButton2 a Clinica
-                  value: _selectedClinic,
-                  hint: const Text(
-                    'Seleccione para su atención',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Poppins',
-                      fontSize: 16,
-                    ),
-                  ),
-                  items: _clinics.map((Clinica clinic) {
-                    return DropdownMenuItem<Clinica>(
-                      value: clinic,
-                      child: Text(
-                        clinic
-                            .nombre, // Asegúrate de que 'nombre' sea un campo de la clase Clinica
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Poppins',
-                          fontSize: 16,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (Clinica? newValue) {
-                    setState(() {
-                      _selectedClinic = newValue;
-                    });
-                  },
-                  isExpanded: true,
-                  buttonStyleData: ButtonStyleData(
-                    height: 60,
-                    width: 367,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.white,
-                    ),
-                  ),
-                  dropdownStyleData: DropdownStyleData(
-                    maxHeight: 210,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.white,
-                    ),
-                  ),
-                  menuItemStyleData: const MenuItemStyleData(
-                    height: 40,
-                    padding: EdgeInsets.only(left: 14, right: 14),
+      ),
+      const SizedBox(height: 10),
+      Container(
+        width: 356,
+        child: Row(
+          children: [
+            const Icon(
+              Icons.grid_view, // Ícono para el selector
+              color: Colors.grey,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: DropdownButton2<String>(
+                value: _selectedClinicName,
+                hint: const Text(
+                  'Seleccione para su atención',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Poppins',
+                    fontSize: 16,
                   ),
                 ),
+                items: [
+                  DropdownMenuItem(
+                    value: 'Clínica ConfíaSalud',
+                    child: const Text(
+                      'Clínica ConfíaSalud',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Clínica Ortega',
+                    child: const Text(
+                      'Clínica Ortega',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Clínica Zarate',
+                    child: const Text(
+                      'Clínica Zarate',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Clínica Rebagliati',
+                    child: const Text(
+                      'Clínica Rebagliati',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Clínica Chenet',
+                    child: const Text(
+                      'Clínica Chenet',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Santo Domingo',
+                    child: const Text(
+                      'Santo Domingo',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'D. Alcides Carrión',
+                    child: const Text(
+                      'D. Alcides Carrión',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  DropdownMenuItem(
+                    value: 'El Carmen',
+                    child: const Text(
+                      'El Carmen',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ],
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedClinicName = newValue;
+                  });
+                },
+                isExpanded: true,
+                buttonStyleData: ButtonStyleData(
+                  height: 60,
+                  width: 367,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white,
+                  ),
+                ),
+                dropdownStyleData: DropdownStyleData(
+                  maxHeight: 210,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: Colors.white,
+                  ),
+                ),
+                menuItemStyleData: const MenuItemStyleData(
+                  height: 40,
+                  padding: EdgeInsets.only(left: 14, right: 14),
+                ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
+
 
   Widget _buildDNIInput() {
     return Column(
@@ -900,32 +986,102 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
   }
 
   Widget _buildRecommendationButton() {
-    return Center(
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-          textStyle: const TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        onPressed: _submitForm,
-        child: const Text(
-          'AGENDAR CITA',
-          style: TextStyle(
-            color: Colors.white, // Cambia el color del texto a azul
-            fontFamily: 'Poppins',
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+  return Center(
+    child: ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.primary,
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
+        textStyle: const TextStyle(
+          fontFamily: 'Poppins',
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
         ),
       ),
-    );
-  }
+      onPressed: _submitForm,
+      child: const Text(
+        'AGENDAR CITA',
+        style: TextStyle(
+          color: Colors.white, // Cambia el color del texto a azul
+          fontFamily: 'Poppins',
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ),
+  );
+}
 
-  void _submitForm() async {
-    
-  }
+void _submitForm() {
+  _showDialog(
+    context,
+    'Cita agendada', // Título del diálogo
+    'Su cita ha sido agendada exitosamente.' // Mensaje del diálogo
+  );
+}
+
+// Función para mostrar la notificación con estilo personalizado
+void _showDialog(BuildContext context, String title, String message) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: AppColors.accent,
+        contentPadding: const EdgeInsets.all(15.0),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontSize: 20,
+            fontFamily: 'Poppins',
+            fontWeight: FontWeight.bold,
+            color: AppColors.primary,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                message,
+                style: const TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  color: AppColors.textPrimary,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 15),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
+              ),
+              child: const Text(
+                'ACEPTAR',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  color: AppColors.white,
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
 }

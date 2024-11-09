@@ -132,6 +132,24 @@ class ServicesScreen extends StatelessWidget {
                 value: '/meeting',
                 child: Row(
                   children: [
+                    Icon(Icons.edit_note, color: AppColors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Agendar cita',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        color: AppColors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: '/perfil',
+                child: Row(
+                  children: [
                     Icon(Icons.event, color: AppColors.white),
                     const SizedBox(width: 8),
                     Text(
@@ -154,24 +172,6 @@ class ServicesScreen extends StatelessWidget {
                     const SizedBox(width: 8),
                     Text(
                       'Sugerencias',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 16,
-                        color: AppColors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const PopupMenuItem<String>(
-                value: '/perfil',
-                child: Row(
-                  children: [
-                    Icon(Icons.info, color: AppColors.white),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Información',
                       style: TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 16,
