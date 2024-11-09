@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'package:usalud_app/services/cita.dart';
+
 import 'category.dart'; // Asegúrate de que la ruta sea correcta
+import 'clinic.dart'; // Asegúrate de que la ruta sea correcta
 import 'package:http/http.dart' as http;
 
 class ApiService {
@@ -189,28 +192,28 @@ class ApiService {
     }
   }
 
-  // Método para obtener todos los servicios
-  Future<List<dynamic>> fetchServices() async {
+  // Función para obtener todas las categorías
+  Future<List<Category>> fetchCategoriesS() async {
     final url = Uri.parse('$baseUrl/auth/categorias-servicios');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      List<dynamic> servicesData = json.decode(response.body);
-      return servicesData
-      .map<Category>((categoria) => Category(
+      List<dynamic> categoriasData = json.decode(response.body);
+      return categoriasData
+          .map<Category>((categoria) => Category(
                 id: categoria[
                     'id'], // Asegúrate de que el ID esté en la respuesta
                 name: categoria['nombre'].toString(),
               ))
           .toList();
     } else {
-      print('Error al cargar servicios: ${response.body}');
+      print('Error al cargar categorías: ${response.body}');
       return [];
     }
   }
 
-  // Método para obtener servicios de una categoría específica
-  Future<List<String>> fetchServiceByCategory(int categoriaId) async {
+  // Método para obtener síntomas de una categoría específica
+  Future<List<String>> fetchServicesByCategory(int categoriaId) async {
     final url = Uri.parse('$baseUrl/auth/servicios/$categoriaId');
     final response = await http.get(url);
 
@@ -227,20 +230,80 @@ class ApiService {
     }
   }
 
-  // Método para buscar servicios por caracteres ingresados
-  Future<List<dynamic>> buscarServicios(String termino) async {
+  // Método para buscar síntomas por caracteres ingresados
+  Future<List<String>> buscarServicios(String termino) async {
     final url = Uri.parse('$baseUrl/auth/buscar-servicios?termino=$termino');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      List<dynamic> servicesData = json.decode(response.body);
-      return servicesData
-          .map<String>((sintoma) => sintoma['nombre'].toString())
+      List<dynamic> serviciosData = json.decode(response.body);
+      return serviciosData
+          .map<String>((servicio) => servicio['nombre'].toString())
           .toList();
     } else {
-      print('Error al buscar servicios: ${response.body}');
+      print('Error al buscar síntomas: ${response.body}');
       return [];
     }
   }
 
+  // Función para obtener todas las clínicas
+  Future<List<Clinica>> fetchClinicas() async {
+    final url = Uri.parse('$baseUrl/auth/listar-clinicas');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      List<dynamic> clinicasData = json.decode(response.body);
+      return clinicasData.map<Clinica>((clinica) => Clinica.fromJson(clinica)).toList();
+    } else {
+      print('Error al cargar clínicas: ${response.body}');
+      return [];
+    }
+  }
+
+  // Método para agendar una cita
+  Future<bool> crearCita({
+    required int servicioId,
+    required int clinicaId,
+    required int documento,
+    String? motivo,
+    required String fecha,
+    required String hora,
+  }) async {
+    final url = Uri.parse('$baseUrl/auth/crear-cita');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'servicio_id': servicioId,
+        'clinica_id': clinicaId,
+        'documento': documento,
+        'motivo': motivo,
+        'fecha': fecha,
+        'hora': hora,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      return true; // Cita creada con éxito
+    } else {
+      print('Error al crear la cita: ${response.body}');
+      return false; // Error en la creación de la cita
+    }
+  }
+
+  // Función para obtener todas las citas
+  Future<List<Cita>> fetchCitas() async {
+    final url = Uri.parse('$baseUrl/auth/citas');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      List<dynamic> citasData = json.decode(response.body);
+      return citasData.map<Cita>((cita) => Cita.fromJson(cita)).toList();
+    } else {
+      print('Error al cargar citas: ${response.body}');
+      return [];
+    }
+  }
 }

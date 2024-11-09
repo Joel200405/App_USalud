@@ -8,6 +8,7 @@ import 'screens/symptoms_screen.dart';
 import 'screens/clinics_screen.dart';
 import 'screens/meetings_screen.dart';
 import 'screens/suggestions_screen.dart';
+import 'screens/view_screen.dart';
 
 void main() {
   runApp(AppSalud());
@@ -34,7 +35,8 @@ class AppSalud extends StatelessWidget {
         '/symptoms': (context) => SymptomScreen(),
         '/clinics': (context) => ClinicsScreen(),
         '/meeting': (context) => MeetingsScreen(),
-        '/emergencias': (context) => SuggestionsScreen()
+        '/emergencias': (context) => SuggestionsScreen(),
+        '/perfil': (context) => ViewScreen()
       },
     );
   }

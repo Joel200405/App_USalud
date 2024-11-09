@@ -19,7 +19,7 @@ class ServicesScreen extends StatelessWidget {
         centerTitle: false,
         backgroundColor: const Color.fromRGBO(110, 244, 220, 1),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primary),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.primary),
           onPressed: () {
             Navigator.pop(context); 
           },
@@ -241,25 +241,25 @@ class ServicesScreen extends StatelessWidget {
                   ),
                   _buildServiceButton(
                     context,
+                    'Agendar cita',
+                    AppColors.secondary,
+                    Icons.edit_note,
+                    '/meeting',
+                  ),
+                  _buildServiceButton(
+                    context,
                     'Citas',
                     AppColors.secondary,
                     Icons.event,
-                    '/meeting',
-                  ),
+                    '/perfil',
+                  ),  
                   _buildServiceButton(
                     context,
                     'Sugerencias',
                     AppColors.secondary,
                     Icons.check,
                     '/emergencias',
-                  ),
-                  _buildServiceButton(
-                    context,
-                    'Información',
-                    AppColors.secondary,
-                    Icons.info,
-                    '/perfil',
-                  ),                    
+                  ),                
                 ],
               ),
             ],

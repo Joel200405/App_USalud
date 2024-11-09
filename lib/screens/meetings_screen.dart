@@ -2,7 +2,63 @@ import 'package:flutter/material.dart';
 import '../styles/colors.dart';
 import '../services/category.dart';
 import '../services/api_service.dart'; // Asegúrate de importar ApiService
+import '../services/clinic.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/services.dart';
+
+class DateInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    final text = newValue.text.replaceAll('/', ''); // Removemos cualquier "/"
+
+    if (newValue.selection.baseOffset == 0) {
+      return newValue; // Permite borrar sin restricciones
+    }
+
+    StringBuffer formattedText = StringBuffer();
+    for (int i = 0; i < text.length; i++) {
+      if (i == 2 || i == 4) {
+        formattedText
+            .write('/'); // Insertar "/" en las posiciones correspondientes
+      }
+      formattedText.write(text[i]);
+    }
+
+    return TextEditingValue(
+      text: formattedText.toString(),
+      selection: TextSelection.collapsed(offset: formattedText.length),
+    );
+  }
+}
+
+class HourInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    // Remueve cualquier ":" existente para manipular solo los dígitos
+    final text = newValue.text.replaceAll(':', '');
+
+    // Permite borrar sin restricciones
+    if (newValue.selection.baseOffset == 0) {
+      return newValue;
+    }
+
+    StringBuffer formattedText = StringBuffer();
+    for (int i = 0; i < text.length; i++) {
+      // Inserta ":" después de los primeros dos dígitos (horas)
+      if (i == 2) {
+        formattedText.write(':');
+      }
+      formattedText.write(text[i]);
+    }
+
+    return TextEditingValue(
+      text: formattedText.toString(),
+      selection: TextSelection.collapsed(offset: formattedText.length),
+    );
+  }
+}
 
 class MeetingsScreen extends StatefulWidget {
   const MeetingsScreen({super.key});
@@ -15,10 +71,21 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
   final TextEditingController _ageController = TextEditingController();
   final TextEditingController _daysController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _dateController = TextEditingController();
+
+  @override
+  void dispose() {
+    _dateController.dispose();
+    super.dispose();
+  }
 
   // Lista de categorías
   List<Category> _categories = [];
   Category? _selectedCategory;
+
+  // Lista de clínicas
+  List<Clinica> _clinics = [];
+  Clinica? _selectedClinic;
 
   // Lista de síntomas seleccionados
   List<String> _selectedSymptoms = [];
@@ -29,15 +96,24 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
   @override
   void initState() {
     super.initState();
-    _fetchCategories(); // Carga las categorías al inicio
+    _fetchCategoriesS(); // Carga las categorías al inicio
+    _fetchClinics(); // Carga las clínicas al inicio
   }
 
-  Future<void> _fetchCategories() async {
+  Future<void> _fetchCategoriesS() async {
     ApiService apiService = ApiService();
     List<Category> categories = await apiService
-        .fetchCategories(); // Asegúrate de que esta función devuelva una lista de objetos Category
+        .fetchCategoriesS(); // Asegúrate de que esta función devuelva una lista de objetos Category
     setState(() {
       _categories = categories;
+    });
+  }
+
+  Future<void> _fetchClinics() async {
+    ApiService apiService = ApiService();
+    List<Clinica> clinics = await apiService.fetchClinicas();
+    setState(() {
+      _clinics = clinics;
     });
   }
 
@@ -45,7 +121,7 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
   void _onSearchSymptoms(String query) async {
     if (query.isNotEmpty) {
       try {
-        _suggestedSymptoms = await ApiService().buscarSintomas(query);
+        _suggestedSymptoms = await ApiService().buscarServicios(query);
       } catch (e) {
         print('Error al buscar síntomas: $e'); // Manejo básico del error
         _suggestedSymptoms =
@@ -83,7 +159,8 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
             ),
             color: AppColors.primary, // Color de fondo del menú desplegable
             shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(16.0)), // Bordes redondeados
+              borderRadius:
+                  BorderRadius.all(Radius.circular(16.0)), // Bordes redondeados
             ),
             onSelected: (String route) {
               Navigator.pushNamed(context, route);
@@ -93,7 +170,8 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
                 value: '/login',
                 child: Row(
                   children: [
-                    Icon(Icons.login, color: AppColors.white), // Ícono de inicio de sesión
+                    Icon(Icons.login,
+                        color: AppColors.white), // Ícono de inicio de sesión
                     const SizedBox(width: 8), // Espacio entre ícono y texto
                     Text(
                       'Inicio de Sesión',
@@ -280,7 +358,7 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
           ),
           cursorColor: AppColors.secondary,
           decoration: const InputDecoration(
-            hintText: 'Busca aquí tu especialidad',
+            hintText: 'Busca aquí la especialidad',
             hintStyle: TextStyle(
               color: Colors.grey,
               fontWeight: FontWeight.bold,
@@ -367,15 +445,17 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
           const SizedBox(height: 20),
           _buildCategorySelector(),
           const SizedBox(height: 20),
+          _buildSpecialtySelector(),
+          const SizedBox(height: 20),
           _buildClinicSelector(),
           const SizedBox(height: 20),
-          _buildSpecialtySelector(),
+          _buildDNIInput(),
           const SizedBox(height: 20),
           _buildReasonInput(),
           const SizedBox(height: 20),
-          _buildAgeInput(),
+          _buildDateInput(),
           const SizedBox(height: 20),
-          _buildDaysWithSymptomsInput(),
+          _buildHourInput(),
           const SizedBox(height: 20),
           _buildRecommendationButton(),
         ],
@@ -388,7 +468,7 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Seleccione una categoría de especialidad:',
+          'Buscar especialidad por categoría:',
           style: TextStyle(
             fontFamily: 'Poppins',
             fontSize: 16,
@@ -411,91 +491,7 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
                 child: DropdownButton2<Category>(
                   value: _selectedCategory,
                   hint: const Text(
-                    'Selecciona una categoría',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Poppins',
-                      fontSize: 16,
-                    ),
-                  ),
-                  items: _categories.map((Category category) {
-                    return DropdownMenuItem<Category>(
-                      value: category,
-                      child: Text(
-                        category.name,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Poppins',
-                          fontSize: 16,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                  onChanged: (Category? newValue) {
-                    setState(() {
-                      _selectedCategory = newValue;
-                    });
-                  },
-                  isExpanded: true,
-                  buttonStyleData: ButtonStyleData(
-                    height: 60,
-                    width: 367,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.white,
-                    ),
-                  ),
-                  dropdownStyleData: DropdownStyleData(
-                    maxHeight: 210,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.white,
-                    ),
-                  ),
-                  menuItemStyleData: const MenuItemStyleData(
-                    height: 40,
-                    padding: EdgeInsets.only(left: 14, right: 14),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildClinicSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Seleccione un centro de salud:',
-          style: TextStyle(
-            fontFamily: 'Poppins',
-            fontSize: 16,
-            color: AppColors.textSecondary,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 10),
-        Container(
-          width: 356,
-          child: Row(
-            children: [
-              const Icon(
-                Icons.grid_view, // Aquí puedes cambiar el ícono
-                color: Colors.grey,
-              ),
-              const SizedBox(
-                  width: 10), // Espacio entre el ícono y el DropdownButton2
-              Expanded(
-                child: DropdownButton2<Category>(
-                  value: _selectedCategory,
-                  hint: const Text(
-                    'Seleccione para su atención',
+                    'Seleccione una categoría',
                     style: TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
@@ -559,7 +555,7 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
     List<String> _currentSymptoms = [];
 
     return FutureBuilder<List<String>>(
-      future: ApiService().fetchSymptomByCategory(_selectedCategory!.id),
+      future: ApiService().fetchServicesByCategory(_selectedCategory!.id),
       builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -625,11 +621,147 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
     );
   }
 
-  Widget _buildReasonInput() {
+  Widget _buildClinicSelector() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
+          'Seleccione un centro de salud:',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 16,
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 10),
+        Container(
+          width: 356,
+          child: Row(
+            children: [
+              const Icon(
+                Icons.grid_view, // Ícono para el selector
+                color: Colors.grey,
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: DropdownButton2<Clinica>(
+                  // Cambié el tipo de DropdownButton2 a Clinica
+                  value: _selectedClinic,
+                  hint: const Text(
+                    'Seleccione para su atención',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Poppins',
+                      fontSize: 16,
+                    ),
+                  ),
+                  items: _clinics.map((Clinica clinic) {
+                    return DropdownMenuItem<Clinica>(
+                      value: clinic,
+                      child: Text(
+                        clinic
+                            .nombre, // Asegúrate de que 'nombre' sea un campo de la clase Clinica
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Poppins',
+                          fontSize: 16,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (Clinica? newValue) {
+                    setState(() {
+                      _selectedClinic = newValue;
+                    });
+                  },
+                  isExpanded: true,
+                  buttonStyleData: ButtonStyleData(
+                    height: 60,
+                    width: 367,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white,
+                    ),
+                  ),
+                  dropdownStyleData: DropdownStyleData(
+                    maxHeight: 210,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white,
+                    ),
+                  ),
+                  menuItemStyleData: const MenuItemStyleData(
+                    height: 40,
+                    padding: EdgeInsets.only(left: 14, right: 14),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDNIInput() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Ingrese el N° de documento:',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 16,
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 10),
+        TextField(
+          controller: _ageController,
+          style: const TextStyle(
+            color: Colors.black,
+            fontFamily: 'Poppins',
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+          cursorColor: AppColors.secondary,
+          keyboardType: TextInputType.number,
+          decoration: const InputDecoration(
+            hintText: 'Su número aquí',
+            hintStyle: TextStyle(
+              color: Colors.grey, // Color del hint
+              fontWeight: FontWeight.bold, // Peso de la fuente del hint
+              fontFamily: 'Poppins', // Familia de la fuente del hint
+              fontSize: 16, // Tamaño de la fuente del hint
+            ),
+            prefixIcon:
+                Icon(Icons.account_circle, color: Colors.grey), // Ícono de la lupa
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+              borderSide: BorderSide(
+                  color: Colors.grey), // Color del borde cuando está inactivo
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+              borderSide: BorderSide(
+                  color: AppColors
+                      .secondary), // Color del borde cuando está enfocado
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildReasonInput() {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
           'Ingrese una breve explicación:',
           style: TextStyle(
             fontFamily: 'Poppins',
@@ -638,37 +770,33 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10),
         TextField(
-          controller: _ageController,
-          style: const TextStyle(
+          style: TextStyle(
             color: Colors.black,
             fontFamily: 'Poppins',
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
           cursorColor: AppColors.secondary,
-          keyboardType: TextInputType.number,
-          decoration: const InputDecoration(
+          keyboardType: TextInputType.text,
+          maxLines: null,
+          decoration: InputDecoration(
             hintText: 'Su explicación aquí',
             hintStyle: TextStyle(
-              color: Colors.grey, // Color del hint
-              fontWeight: FontWeight.bold, // Peso de la fuente del hint
-              fontFamily: 'Poppins', // Familia de la fuente del hint
-              fontSize: 16, // Tamaño de la fuente del hint
+              color: Colors.grey,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Poppins',
+              fontSize: 16,
             ),
-            prefixIcon:
-                Icon(Icons.notes, color: Colors.grey), // Ícono de la lupa
+            prefixIcon: Icon(Icons.notes, color: Colors.grey),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(20)),
-              borderSide: BorderSide(
-                  color: Colors.grey), // Color del borde cuando está inactivo
+              borderSide: BorderSide(color: Colors.grey),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.all(Radius.circular(20)),
-              borderSide: BorderSide(
-                  color: AppColors
-                      .secondary), // Color del borde cuando está enfocado
+              borderSide: BorderSide(color: AppColors.secondary),
             ),
           ),
         ),
@@ -676,12 +804,12 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
     );
   }
 
-  Widget _buildAgeInput() {
+  Widget _buildDateInput() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Ingrese la fecha de la cita:',
+          'Ingrese una fecha (12/12/2024):',
           style: TextStyle(
             fontFamily: 'Poppins',
             fontSize: 16,
@@ -691,7 +819,8 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
         ),
         const SizedBox(height: 10),
         TextField(
-          controller: _ageController,
+          controller: _dateController,
+          inputFormatters: [DateInputFormatter()],
           style: const TextStyle(
             color: Colors.black,
             fontFamily: 'Poppins',
@@ -700,26 +829,22 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
           ),
           cursorColor: AppColors.secondary,
           keyboardType: TextInputType.number,
-          decoration: const InputDecoration(
-            hintText: 'La fecha aquí',
-            hintStyle: TextStyle(
-              color: Colors.grey, // Color del hint
-              fontWeight: FontWeight.bold, // Peso de la fuente del hint
-              fontFamily: 'Poppins', // Familia de la fuente del hint
-              fontSize: 16, // Tamaño de la fuente del hint
+          decoration: InputDecoration(
+            hintText: 'DD/MM/AAAA',
+            hintStyle: const TextStyle(
+              color: Colors.grey,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Poppins',
+              fontSize: 16,
             ),
-            prefixIcon:
-                Icon(Icons.today, color: Colors.grey), // Ícono de la lupa
+            prefixIcon: const Icon(Icons.today, color: Colors.grey),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-              borderSide: BorderSide(
-                  color: Colors.grey), // Color del borde cuando está inactivo
+              borderRadius: BorderRadius.circular(20),
+              borderSide: const BorderSide(color: Colors.grey),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-              borderSide: BorderSide(
-                  color: AppColors
-                      .secondary), // Color del borde cuando está enfocado
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide(color: AppColors.secondary),
             ),
           ),
         ),
@@ -727,12 +852,12 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
     );
   }
 
-  Widget _buildDaysWithSymptomsInput() {
+  Widget _buildHourInput() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'Ingrese la hora de la cita:',
+          'Ingrese una hora (12:34):',
           style: TextStyle(
             fontFamily: 'Poppins',
             fontSize: 16,
@@ -742,7 +867,7 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
         ),
         const SizedBox(height: 10),
         TextField(
-          controller: _daysController,
+          inputFormatters: [HourInputFormatter()],
           style: const TextStyle(
             color: Colors.black,
             fontFamily: 'Poppins',
@@ -751,26 +876,22 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
           ),
           cursorColor: AppColors.secondary,
           keyboardType: TextInputType.number,
-          decoration: const InputDecoration(
-            hintText: 'La hora aquí',
-            hintStyle: TextStyle(
-              color: Colors.grey, // Color del hint
-              fontWeight: FontWeight.bold, // Peso de la fuente del hint
-              fontFamily: 'Poppins', // Familia de la fuente del hint
-              fontSize: 16, // Tamaño de la fuente del hint
+          decoration: InputDecoration(
+            hintText: 'HH:MM',
+            hintStyle: const TextStyle(
+              color: Colors.grey,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'Poppins',
+              fontSize: 16,
             ),
-            prefixIcon: Icon(Icons.access_time,
-                color: Colors.grey), // Ícono de la lupa
+            prefixIcon: const Icon(Icons.access_time, color: Colors.grey),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-              borderSide: BorderSide(
-                  color: Colors.grey), // Color del borde cuando está inactivo
+              borderRadius: BorderRadius.circular(20),
+              borderSide: const BorderSide(color: Colors.grey),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20)),
-              borderSide: BorderSide(
-                  color: AppColors
-                      .secondary), // Color del borde cuando está enfocado
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide(color: AppColors.secondary),
             ),
           ),
         ),
@@ -805,246 +926,6 @@ class _MeetingsScreenState extends State<MeetingsScreen> {
   }
 
   void _submitForm() async {
-    // Validar si todos los campos están vacíos
-    if (_ageController.text.isEmpty &&
-        _daysController.text.isEmpty &&
-        _selectedSymptoms.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, complete todos los campos.')),
-      );
-      return;
-    }
-
-    // Validar si los campos de edad y días de síntomas están vacíos
-    if (_ageController.text.isEmpty && _daysController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, complete el campo de su edad y la cantidad de días con síntomas.')),
-      );
-      return;
-    } else if (_ageController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, complete el campo de su edad.')),
-      );
-      return;
-    } else if (_daysController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, complete el campo de la cantidad de días con sintomas.')),
-      );
-      return;
-    }
-
-    // Convertir los textos a enteros después de la validación de vacíos
-    int edad = int.parse(_ageController.text);
-    int diasSintomas = int.parse(_daysController.text);
-
-    // Validar si la edad está en un rango válido (por ejemplo, entre 0 y 120 años)
-    if (edad < 0 || edad > 100) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                'Por favor, ingresa una edad válida (entre 0 y 100 años)')),
-      );
-      return;
-    }
-
-    // Si los síntomas fueron seleccionados desde el buscador, no se necesita categoría
-    bool seleccionDirecta =
-        _selectedSymptoms.isNotEmpty && _selectedCategory == null;
-
-    // Verifica si los síntomas están seleccionados y la categoría está presente si no se seleccionó directamente
-    if (_selectedSymptoms.isEmpty ||
-        (!seleccionDirecta && _selectedCategory == null)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('Por favor, selecciona una categoría y síntomas')),
-      );
-      return;
-    }
-
-    Map<String, int> sintomasIds = {
-      "Congestión nasal": 1,
-      "Tos seca": 2,
-      "Tos con flema": 3,
-      "Dolor de garganta": 4,
-      "Estornudos": 5,
-      "Falta de aire": 6,
-      "Respiración rápida": 7,
-      "Silbidos al respirar": 8,
-      "Dolor en el pecho": 9,
-      "Tos con sangre": 10,
-      "Fiebre": 11,
-      "Escalofríos": 12,
-      "Sudores nocturnos": 13,
-      "Fatiga extrema": 14,
-      "Pérdida de peso": 15,
-      "Malestar general": 16,
-      "Dolor muscular": 17,
-      "Dolor en las articulaciones": 18,
-      "Dolor de cabeza": 19,
-      "Náuseas": 20,
-      "Vómitos": 21,
-      "Diarrea": 22,
-      "Dolor abdominal": 23,
-      "Pérdida de apetito": 24,
-      "Hambre excesiva": 25,
-      "Dolor al tragar": 26,
-      "Visión borrosa": 27,
-      "Mareos": 28,
-      "Cambios en la visión": 29,
-      "Confusión": 30,
-      "Ansiedad": 31,
-      "Hormigueo en manos o pies": 32,
-      "Sarpullido": 33,
-      "Heridas lentas": 34,
-      "Moretones": 35,
-      "Piel seca": 36,
-      "Costras en la piel": 37,
-      "Sangrado en encías": 38,
-      "Dolor en la lengua": 39,
-      "Llagas en la boca": 40,
-      "Uñas quebradizas": 41,
-      "Orina frecuente": 42,
-      "Sangre en la orina": 43,
-      "Dolor al orinar": 44,
-      "Infecciones urinarias": 45,
-      "Presión alta": 46,
-      "Palpitaciones": 47,
-      "Latidos rápidos": 48,
-      "Sangrado nasal": 50,
-      "Infecciones frecuentes": 51,
-      "Ganglios inflamados": 52,
-      "Heridas que no sanan": 53,
-      "Resfriados constantes": 54,
-      "Problemas de cicatrización": 55,
-      "Pérdida del olfato": 56,
-      "Pérdida del gusto": 57,
-      "Inquietud": 58,
-      "Tensión": 59,
-      "Pérdida de sueño": 60,
-      "Debilidad": 61,
-      "Piel pálida": 62,
-      "Dolor en el área": 63,
-      "Sangrado": 64,
-    };
-
-    // Convertir los síntomas seleccionados a IDs
-    List<int> sintomasSeleccionados =
-        _selectedSymptoms.map((s) => sintomasIds[s]!).toList();
-
-    // Llamar al método de la API
-    Map<String, String> resultado =
-      await ApiService().obtenerEnfermedadYRecomendacion(
-      sintomasSeleccionados: sintomasSeleccionados,
-      edad: edad,
-      diasSintomas: diasSintomas,
-    );
-
-    // Mostrar el diálogo con los resultados
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: AppColors.accent,
-          contentPadding: const EdgeInsets.all(15.0),
-          title: const Text(
-            'Resultado del Diagnóstico',
-            style: TextStyle(
-              fontSize: 20,
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: RichText(
-                  text: TextSpan(
-                    children: [
-                      const TextSpan(
-                        text: 'Enfermedad: ',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 17,
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      TextSpan(
-                        text: resultado['enfermedad'],
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 16,
-                          color: AppColors.textPrimary,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-              RichText(
-                textAlign: TextAlign.justify,
-                text: TextSpan(
-                  children: [
-                    const TextSpan(
-                      text: 'Recomendación: ',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 17,
-                        color: AppColors.primary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    TextSpan(
-                      text: resultado['recomendacion'],
-                      style: const TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 16,
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 15),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  setState(() {
-                    _ageController.clear();
-                    _daysController.clear();
-                    _selectedSymptoms.clear();
-                    _selectedCategory = null;
-                    _searchController.clear();
-                    _suggestedSymptoms.clear();
-                  });
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-                child: const Text(
-                  '      GRACIAS      ',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Poppins',
-                    fontSize: 16,
-                    color: AppColors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+    
   }
 }

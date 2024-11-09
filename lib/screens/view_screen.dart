@@ -1,29 +1,16 @@
 import 'package:flutter/material.dart';
-import '../styles/colors.dart'; // Asegúrate de tener esta ruta correcta
-import '../services/api_service.dart'; // Asegúrate de que esta ruta sea correcta
+import 'package:intl/intl.dart'; // Para formatear la fecha
+import '../services/api_service.dart'; // Asegúrate de que el path sea el correcto
+import '../services/cita.dart'; // Asegúrate de que el path sea el correcto
+import '../styles/colors.dart';
 
-class ClinicsScreen extends StatefulWidget {
-  const ClinicsScreen({super.key});
+class ViewScreen extends StatelessWidget {
+  const ViewScreen({Key? key}) : super(key: key);
 
-  @override
-  _ClinicsScreenState createState() => _ClinicsScreenState();
-}
-
-class _ClinicsScreenState extends State<ClinicsScreen> {
-  List<dynamic> _clinics = [];
-  final ApiService _apiService = ApiService(); // Instancia del ApiService
-
-  @override
-  void initState() {
-    super.initState();
-    _fetchClinics(); // Llama al método para obtener clínicas
-  }
-
-  Future<void> _fetchClinics() async {
-    final clinics = await _apiService.fetchClinics(); // Llama al nuevo método
-    setState(() {
-      _clinics = clinics; // Actualiza el estado con las clínicas obtenidas
-    });
+  // Función para formatear la fecha en formato legible
+  String formatFecha(String fecha) {
+    final dateTime = DateTime.parse(fecha);
+    return DateFormat('dd/MM/yyyy').format(dateTime); // Ejemplo: 09/11/2024
   }
 
   @override
@@ -40,7 +27,7 @@ class _ClinicsScreenState extends State<ClinicsScreen> {
           },
         ),
         title: Text(
-          'Listado de Centros de Salud',
+          'Lista de Citas',
           style: TextStyle(
             fontFamily: 'Poppins',
             fontWeight: FontWeight.bold,
@@ -211,120 +198,117 @@ class _ClinicsScreenState extends State<ClinicsScreen> {
         ],
         backgroundColor: const Color.fromRGBO(110, 244, 220, 1),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: _clinics.isEmpty 
-            ? Center(child: CircularProgressIndicator()) // Muestra un loader mientras se cargan las clínicas
-            : GridView.builder(
+      body: FutureBuilder<List<Cita>>(
+        future: ApiService()
+            .fetchCitas(), // Llama al método fetchCitas() del servicio API
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // Muestra un indicador de carga mientras se obtienen los datos
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            // Muestra un mensaje de error si la solicitud falla
+            return Center(child: Text('Error al cargar las citas'));
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            // Muestra un mensaje si no hay citas disponibles
+            return Center(child: Text('No hay citas disponibles'));
+          } else {
+            // Construye la lista de citas
+            final citas = snapshot.data!;
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, // Dos contenedores por fila
+                  crossAxisCount: 2, // Dos citas por fila
                   crossAxisSpacing: 16.0,
                   mainAxisSpacing: 16.0,
                 ),
-                itemCount: _clinics.length,
+                itemCount: citas.length,
                 itemBuilder: (context, index) {
-                  return _buildClinicButton(context, _clinics[index]);
+                  final cita = citas[index];
+                  return _buildCitaCard(context, cita);
                 },
               ),
+            );
+          }
+        },
       ),
     );
   }
 
-  Widget _buildClinicButton(BuildContext context, dynamic clinic) {
-    // Convertir la calificación a double para evitar errores de tipo
-    double calificacion = (clinic['calificacion'] as num).toDouble();
-
+  // Método para construir el contenedor de cada cita
+  Widget _buildCitaCard(BuildContext context, Cita cita) {
     return GestureDetector(
       onTap: () {
-        // Aquí puedes manejar la navegación a la pantalla de detalles de la clínica
+        // Muestra detalles adicionales al tocar una cita
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('${cita.servicio} en ${cita.clinica}'),
+            content: Text(
+              'Documento: ${cita.documento}\n'
+              'Motivo: ${cita.motivo}\n'
+              'Fecha: ${formatFecha(cita.fecha)}\n'
+              'Hora: ${cita.hora}', // Muestra la hora sin cambios
+            ),
+          ),
+        );
       },
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
-          color: Colors.white, // Fondo blanco para el marco
+          color: Colors.white,
           boxShadow: [
             BoxShadow(
-              color: Colors.black26, // Color de la sombra
-              blurRadius: 8, // Desenfoque de la sombra
-              spreadRadius: 1, // Expansión de la sombra
-              offset: Offset(0, 4), // Desplazamiento de la sombra
+              color: Colors.black26,
+              blurRadius: 8,
+              spreadRadius: 1,
+              offset: Offset(0, 4),
             ),
           ],
         ),
-        clipBehavior: Clip.antiAlias, // Esta propiedad asegura que el contenido no sobresalga
-        child: Stack(
-          children: [
-            // Widget para mostrar la imagen de fondo
-            Image.asset(
-              clinic['foto_url'], // Usa foto_url que contiene la ruta de la imagen
-              fit: BoxFit.cover, // Ajusta cómo se adapta la imagen
-              width: double.infinity, // Ocupa todo el ancho del contenedor
-              height: 120, // Ajusta la altura según sea necesario
-            ),
-            // Widget para el contenido (nombre y calificación) encima de la imagen
-            Container(
-              padding: const EdgeInsets.all(8.0), // Espaciado interno
-              alignment: Alignment.bottomCenter, // Alinea el contenido en la parte inferior central
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end, // Alinea el contenido en la parte inferior
-                crossAxisAlignment: CrossAxisAlignment.center, // Alinea el contenido horizontalmente en el centro
-                children: [
-                  LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Text(
-                        clinic['nombre'], // Nombre de la clínica
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: constraints.maxWidth * 0.09, // Ajusta el tamaño de la fuente en función del ancho del contenedor
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                        textAlign: TextAlign.center,
-                      );
-                    },
-                  ),
-
-                  const SizedBox(height: 4), // Espacio entre nombre y calificación
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: _buildStarRating(calificacion),
-                  ),
-                ],
+        clipBehavior: Clip.antiAlias,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center, // Centra verticalmente
+            crossAxisAlignment:
+                CrossAxisAlignment.center, // Centra horizontalmente
+            children: [
+              // Título de la cita (servicio y clínica)
+              Text(
+                '${cita.servicio} - ${cita.clinica}',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center, // Centra el texto
               ),
-            ),
-          ],
+              const SizedBox(height: 8),
+              // Detalles de la cita (fecha y hora)
+              Text(
+                'Fecha: ${formatFecha(cita.fecha)}',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 14,
+                  color: Colors.black54,
+                ),
+                textAlign: TextAlign.center, // Centra el texto
+              ),
+              Text(
+                'Hora: ${cita.hora}',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 14,
+                  color: Colors.black54,
+                ),
+                textAlign: TextAlign.center, // Centra el texto
+              ),
+            ],
+          ),
         ),
       ),
     );
-  }
-
-  // Método para construir las estrellas basado en la calificación
-  List<Widget> _buildStarRating(double rating) {
-    List<Widget> stars = [];
-    for (int i = 1; i <= 5; i++) {
-      if (i <= rating) {
-        // Estrella llena
-        stars.add(const Icon(
-          Icons.star,
-          color: Color.fromRGBO(250, 142, 4, 1),
-          size: 20,
-        ));
-      } else if (i - rating < 1) {
-        // Media estrella
-        stars.add(const Icon(
-          Icons.star_half,
-          color: Color.fromRGBO(250, 142, 4, 1),
-          size: 20,
-        ));
-      } else {
-        // Estrella vacía
-        stars.add(const Icon(
-          Icons.star_border,
-          color: Color.fromRGBO(250, 142, 4, 1),
-          size: 20,
-        ));
-      }
-    }
-    return stars;
   }
 }
