@@ -265,17 +265,42 @@ Widget _buildCitaCard(BuildContext context, Cita cita) {
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Text(
-                    'Documento: ${cita.documento}\n'
-                    'Motivo: ${cita.motivo}\n'
-                    'Fecha: ${formatFecha(cita.fecha)}\n'
-                    'Hora: ${cita.hora}',
-                    style: const TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 16,
-                      color: AppColors.textPrimary,
+                  child: RichText(
+                    text: TextSpan(
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 16,
+                        color: AppColors.textPrimary,
+                      ),
+                      children: [
+                        const TextSpan(
+                          text: 'Medico: ',
+                          style: TextStyle(fontWeight: FontWeight.bold), // Estilo negrita
+                        ),
+                        TextSpan(text: '${cita.medico}\n'),
+                        const TextSpan(
+                          text: 'Documento: ',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(text: '${cita.documento}\n'),
+                        const TextSpan(
+                          text: 'Motivo: ',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(text: '${cita.motivo}\n'),
+                        const TextSpan(
+                          text: 'Fecha: ',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(text: '${formatFecha(cita.fecha)}\n'),
+                        const TextSpan(
+                          text: 'Hora: ',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(text: '${cita.hora}'),
+                      ],
                     ),
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.left,
                   ),
                 ),
                 const SizedBox(height: 15),

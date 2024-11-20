@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../styles/colors.dart';
+import 'dart:io';
 
 class ServicesScreen extends StatelessWidget {
   const ServicesScreen({super.key});
@@ -21,7 +22,7 @@ class ServicesScreen extends StatelessWidget {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: AppColors.primary),
           onPressed: () {
-            Navigator.pop(context); 
+            exit(0);
           },
         ),
         actions: [

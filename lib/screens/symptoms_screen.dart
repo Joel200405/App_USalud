@@ -400,7 +400,7 @@ class _SymptomScreenState extends State<SymptomScreen> {
           child: Row(
             children: [
               const Icon(
-                Icons.grid_view, // Aquí puedes cambiar el ícono
+                Icons.grid_view_rounded, // Aquí puedes cambiar el ícono
                 color: Colors.grey,
               ),
               const SizedBox(

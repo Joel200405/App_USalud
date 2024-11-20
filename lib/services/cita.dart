@@ -7,8 +7,9 @@ class Cita {
   final String motivo;
   final String fecha;
   final String hora;
+  final String medico;
 
-  Cita({required this.id, required this.servicio, required this.clinica, required this.documento, required this.motivo, required this.fecha, required this.hora});
+  Cita({required this.id, required this.servicio, required this.clinica, required this.documento, required this.motivo, required this.fecha, required this.hora, required this.medico});
 
   // Método para crear una instancia de Clinica a partir de un mapa JSON
   factory Cita.fromJson(Map<String, dynamic> json) {
@@ -20,6 +21,7 @@ class Cita {
       motivo: json['motivo'],
       fecha: json['fecha'],
       hora: json['hora'],
+      medico:json['medico']
     );
   }
 }
